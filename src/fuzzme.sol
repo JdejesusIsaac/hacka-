@@ -4,11 +4,14 @@ pragma solidity ^0.8.20;
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
+import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import { ReentrancyGuard } from "./ReentrancyGuard.sol";
 
 
 contract Vesting is
-    ReentrancyGuard
+    
+    ReentrancyGuard,
+    OwnableUpgradeable
     
 {
     using SafeERC20 for IERC20;
@@ -28,14 +31,31 @@ contract Vesting is
     mapping(address => VestingInfo) public vestingInfo;
 
     event VestedTokens(address indexed user, bool isLowFDVedPhase, uint256 amount);
+    event padSet(address newLaunchpadAddress);
 
      error Onlypad();
+
+    error AddressZero();
+
+      constructor() {
+        _disableInitializers();
+    }
+
+    /* ============ Initializer ============ */
+    
 
 
 
       modifier onlypad() {
         if (padContract != msg.sender) revert Onlypad();
         _;
+    }
+
+     function setLaunchpad(address _newAddress) external onlyOwner {
+        if (_newAddress == address(0)) revert AddressZero();
+        padContract = _newAddress;
+
+        emit padSet(_newAddress);
     }
 
     function vestTokens(
