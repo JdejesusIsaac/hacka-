@@ -79,6 +79,19 @@ contract Vesting is
         HIGH_FDV_VESTING_DURATION = _highFDVVestingDuration;
     }
 
+    function configpadVesting(
+    address _projectToken,
+    uint256 _lowFDVVestingDuration,
+    uint256 _highFDVVestingDuration
+) external onlyOwner {
+    require(vestingStartTime == 0, "Vesting has already started");
+    if (address(_projectToken) == address(0)) revert AddressZero();
+    projectToken = IERC20(_projectToken);
+
+    LOW_FDV_VESTING_DURATION = _lowFDVVestingDuration;
+    HIGH_FDV_VESTING_DURATION = _highFDVVestingDuration;
+}
+
     function getClaimable(
         address account
     ) external view returns (uint256 lowFDVAmount, uint256 highFDVAmount) {
