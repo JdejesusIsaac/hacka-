@@ -2,12 +2,15 @@
 
 pragma solidity 0.8.13;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+//import "@openzeppelin/contracts/access/Ownable.sol";
+import "./interface2.sol";
+//import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+//import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./AkiOracle.sol";
 
-contract AkiTokenDispenser is Ownable {
+contract AkiTokenDispenser  {
+    address public owner;
+
     struct BillEnvelope {
         IERC20 token;
         string activityId;
@@ -45,6 +48,16 @@ contract AkiTokenDispenser is Ownable {
 
     event addActivity(IERC20 token, string activityId, uint256 amount);
     event receiveAward(IERC20 token, string activityId, uint256 amount);
+
+    // init owner
+    constructor() {
+        owner = msg.sender;
+    }
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Not owner");
+        _;
+    }
 
     function hashCompareInternal(
         string memory a,

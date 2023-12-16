@@ -81,9 +81,9 @@ contract VaultTest is Test {
 
     function test_depositFuzz() public {
      // assets = bound(assets, 0, 1e30);
-       mockAsset.mint(address(this), 1000);
+       mockAsset.mint(address(this), 1000 ether);
        
-      mockAsset.approve(address(vault), 1000);
+      mockAsset.approve(address(vault), 1000 ether);
       vault._deposit(1000, address(this));
        
       // uint256 beforeBalance = mockAsset.balanceOf(address(this));
@@ -101,7 +101,7 @@ contract VaultTest is Test {
  //   }
 
     function test_totalAssetsOfUser() public {
-        assertEq(vault.totalAssetsOfUser(address(vault)), 1000);
+        assertEq(vault.totalAssetsOfUser(address(vault)), 1000 ether);
     }
     function test_lendOnAave() public {
         vault.lendOnAave(address(weth), 200);
