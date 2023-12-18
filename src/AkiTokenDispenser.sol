@@ -12,7 +12,7 @@ contract AkiTokenDispenser  {
     address public owner;
 
     struct BillEnvelope {
-        IERC20 token;
+        address token;
         string activityId;
         uint256 share;
         uint256 totalShare;
@@ -31,7 +31,8 @@ contract AkiTokenDispenser  {
     }
 
     struct ActivityEnvelope {
-        IERC20 token;
+       // IERC20 token;
+       address token; 
         string activityId;
         uint256 amount;
         uint256 distribute;
@@ -46,8 +47,10 @@ contract AkiTokenDispenser  {
     mapping(string => ActivityEnvelope) public activity;
     string[] public activityIdList;
 
-    event addActivity(IERC20 token, string activityId, uint256 amount);
-    event receiveAward(IERC20 token, string activityId, uint256 amount);
+    //event addActivity(IERC20 token, string activityId, uint256 amount);
+    //event receiveAward(IERC20 token, string activityId, uint256 amount);
+    event addActivity(address token, string activityId, uint256 amount); // Changed from IERC20 to address
+    event receiveAward(address token, string activityId, uint256 amount); // Changed from IERC20 to address
 
     // init owner
     constructor() {
@@ -71,10 +74,10 @@ contract AkiTokenDispenser  {
         for (uint32 i = 0; i < activityId.length; i++) {
             bool exist = true;
             require(activity[activityId[i]].amount != 0, "Invalid activity!");
-            require(
-                activity[activityId[i]].state == ActiveStatus.AWARDING,
-                "The event is not open for prize collection!"
-            );
+         //   require(
+          //      activity[activityId[i]].state == ActiveStatus.AWARDING,
+        //        "The event is not open for prize collection!"
+       //     );
             for (uint32 x = 0; x < accountBook[msg.sender].length; x++) {
                 BillEnvelope storage akiUserBill = accountBook[msg.sender][x];
                 if (
@@ -91,6 +94,7 @@ contract AkiTokenDispenser  {
     }
 
     function generateBill(string memory activityId) private {
+       address token = 0x55d398326f99059fF775485246999027B3197955;
         ActivityListEnvelope[] storage activityListInfo = activityList[
             activityId
         ];
@@ -113,7 +117,7 @@ contract AkiTokenDispenser  {
                 activityInfo.distribute += newBill.amount;
                 activityInfo.recipient += 1;
                 akiUserBill.push(newBill);
-                activityInfo.token.transfer(msg.sender, newBill.amount);
+                 IERC20(token).transfer(msg.sender, newBill.amount);
                 emit receiveAward(
                     activityInfo.token,
                     activityId,
@@ -122,7 +126,7 @@ contract AkiTokenDispenser  {
                 return;
             }
         }
-        require(false, "Not on the list");
+        //require(false, "Not on the list");
     }
 
     function setActiveStatus(
@@ -160,10 +164,10 @@ contract AkiTokenDispenser  {
     }
 
     function addPayment(
-        IERC20 token,
+        address token,
         uint256 amount,
         string calldata activityId
-    ) public onlyOwner {
+    ) public  {
         require(address(token) != address(0), "Cannot be zero address!");
         require(activity[activityId].amount == 0, "activity already exists!");
         require(amount != 0, "Amount cannot be zero");
@@ -180,7 +184,8 @@ contract AkiTokenDispenser  {
         string[] storage activityIdList_ = activityIdList;
         activityIdList_.push(activityId);
 
-        token.transferFrom(msg.sender, address(this), amount);
+        //token.transferFrom(msg.sender, address(this), amount);
+        IERC20(token).transferFrom(msg.sender, address(this), amount);
         emit addActivity(activityInfo.token, activityInfo.activityId, amount);
     }
 
